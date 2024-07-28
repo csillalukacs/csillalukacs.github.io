@@ -1,5 +1,9 @@
 import * as THREE from 'three';
 import Cube from './Cube.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {OutlinePass} from 'three/addons/postprocessing/OutlinePass.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 const sizes = {
     width: window.innerWidth,
@@ -7,11 +11,10 @@ const sizes = {
 }
  
 window.addEventListener('mousemove', (event) =>
-    {
-        cube.mouse.x = event.clientX / sizes.width * 2 - 1
-        cube.mouse.y = - (event.clientY / sizes.height) * 2 + 1
-    
-    })
+{
+    cube.mouse.x = event.clientX / sizes.width * 2 - 1
+    cube.mouse.y = - (event.clientY / sizes.height) * 2 + 1
+})
 
 window.addEventListener('resize', () =>
 {
@@ -28,28 +31,22 @@ window.addEventListener('keydown', (e) =>
     switch (e.key)
     {
         case 'w':
-            cube.updateSide(0);
-            cube.animating = 0;
+            cube.startRotation(0);
             break;
         case 's':
-            cube.updateSide(1);
-            cube.animating = 1;
+            cube.startRotation(1);
             break;
         case 'a':
-            cube.updateSide(2);
-            cube.animating = 2;
+            cube.startRotation(2);
             break;
         case 'd':
-            cube.updateSide(3);
-            cube.animating = 3;
+            cube.startRotation(3);
             break;
         case 'q':
-            cube.updateSide(4);
-            cube.animating = 4;
+            cube.startRotation(4);
             break;
         case 'e':
-            cube.updateSide(5);
-            cube.animating = 5;
+            cube.startRotation(5);
             break;
     }
 })
@@ -62,18 +59,22 @@ const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+
+const controls = new OrbitControls( camera, renderer.domElement );
+controls.enableZoom = false;
+
 // add some lights to the scene
 const pointLight = new THREE.PointLight(0xffffff, 30)
-pointLight.position.x = 2
-pointLight.position.y = 3
-pointLight.position.z = 5
+pointLight.position.set(2,3,5)
 scene.add(pointLight)
 
 const pointLight2 = new THREE.PointLight(0xffffff, 30)
-pointLight2.position.x = 0
-pointLight2.position.y = 3
-pointLight2.position.z = 0
+pointLight2.position.set(0, 3, 0)
 scene.add(pointLight2)
+
+const pointLight3 = new THREE.PointLight(0xffffff, 30)
+pointLight3.position.set(0, 0, 6)
+scene.add(pointLight3)
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
@@ -85,15 +86,24 @@ camera.position.z = 6;
 
 const geometry = new THREE.BoxGeometry(20, 20, 20);
 const material = new THREE.MeshStandardMaterial({ 
-    color: 0xffffff, roughness: 0.3, metalness: 0.9, side: THREE.BackSide 
+    color: 0xffffff, roughness: 0.0, metalness: 0.0, side: THREE.BackSide 
 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
+
+let composer = new EffectComposer( renderer );
+
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+
+export const outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+composer.addPass( outlinePass );
+
 function animate() 
 {
     cube.update();
-	renderer.render( scene, camera );
+	composer.render();
 
 }
 renderer.setAnimationLoop( animate );
