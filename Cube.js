@@ -1,13 +1,17 @@
 import * as THREE from 'three';
+import Cubie from './Cubie.js';
 
 export default class Cube
 {
-    constructor(scene) 
+    constructor(scene, camera) 
     {
         this.scene = scene;
+        this.camera = camera;
         this.group = new THREE.Group();
         this.animating = -1;
         this.cubies = [];
+        this.raycaster = new THREE.Raycaster()
+        this.mouse = new THREE.Vector2()
 
         
         this.sides = [];
@@ -26,7 +30,7 @@ export default class Cube
     getRelativePosition(cubie)
     {
         let position = new THREE.Vector3();
-        cubie.getWorldPosition(position);
+        cubie.mesh.getWorldPosition(position);
         const mat = this.group.matrix.clone();
         mat.invert();
         position.applyMatrix4(mat);
@@ -58,16 +62,13 @@ export default class Cube
         this.cubies.forEach(cubie => 
         {
             const parent = this.isOnSide(cubie, sideIndex) ? this.sides[sideIndex] : this.theRest;
-            parent.attach(cubie);
+            parent.attach(cubie.mesh);
         });
     }
   
     createCubie(x, y, z, color) 
     {
-        const geometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
-        const material = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3, metalness: 0.9 });
-        const cubie = new THREE.Mesh(geometry, material);
-        cubie.position.set(x, y, z);
+        const cubie = new Cubie(x, y, z, color);
         this.cubies.push(cubie);
         return cubie;
     }
@@ -82,7 +83,7 @@ export default class Cube
                 {
                     let color = i === 0 ? 0xdd88dd : i===1 ? 0x23eedd : 0x3344aa;
                     const cubie = this.createCubie(i, j, k, color);
-                    this.theRest.add(cubie);
+                    this.theRest.add(cubie.mesh);
                 }
             }
         }
@@ -110,5 +111,23 @@ export default class Cube
         this.group.rotation.x += 0.002;
         this.group.rotation.y += 0.002;
         if (this.animating > -1) this.animateSide(this.animating);
+
+        this.raycaster.setFromCamera(this.mouse, this.camera)
+    
+        const objectsToTest = this.cubies.map(cubie => cubie.mesh);
+        const intersects = this.raycaster.intersectObjects(objectsToTest)
+        for (const cubie of this.cubies)
+        {
+            if (intersects[0] && cubie.mesh === intersects[0].object) 
+            {
+                //set the color to a slightly brighter version of the original color
+                const original = cubie.mesh.material.color
+                cubie.mesh.material.color.set(original.r*1.1,original.g*1.1,original.b*1.1);
+            }
+            else 
+            {
+                cubie.mesh.material.color.set(cubie.color);
+            }
+        }
     }
 }

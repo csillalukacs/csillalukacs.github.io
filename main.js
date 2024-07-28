@@ -5,7 +5,13 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
-
+ 
+window.addEventListener('mousemove', (event) =>
+    {
+        cube.mouse.x = event.clientX / sizes.width * 2 - 1
+        cube.mouse.y = - (event.clientY / sizes.height) * 2 + 1
+    
+    })
 
 window.addEventListener('resize', () =>
 {
@@ -69,13 +75,20 @@ pointLight2.position.y = 3
 pointLight2.position.z = 0
 scene.add(pointLight2)
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
 
-const cube = new Cube(scene);
+const cube = new Cube(scene, camera);
 cube.addtoScene(scene);
 camera.position.z = 6;
 
+
+const geometry = new THREE.BoxGeometry(20, 20, 20);
+const material = new THREE.MeshStandardMaterial({ 
+    color: 0xffffff, roughness: 0.3, metalness: 0.9, side: THREE.BackSide 
+});
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
 
 function animate() 
 {
