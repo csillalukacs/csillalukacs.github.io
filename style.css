@@ -1,28 +1,45 @@
 :root{
     --lines-color: rgba(100, 0, 80, 0.4);
+    --text-color: rgba(5, 119, 128, 0.884);
 }
 
 *
 {
     font-family: Helvetica, sans-serif;
     background-color: rgb(255, 240, 240);
+    color: var(--text-color);
 }
 
 #background
 {
-    position: fixed;
-    height: 100vh;
+    position: absolute;
     width: 100vw;
+    min-height: 100vh;
     top: 0;
     left: 0;
     background: repeating-linear-gradient(transparent, transparent 30px, var(--lines-color) 30px, var(--lines-color) 31px),
                 repeating-linear-gradient(0.25turn, transparent, transparent 30px, var(--lines-color) 30px, var(--lines-color) 31px);
 }
 
+#header
+{
+    font-size: 48px;
+    font-family: 'Courier New', Courier, monospace;
+    margin: auto;
+    width:40vw;
+    height: 10vh;
+    min-width: 500px;
+    padding: 0;
+    text-align: left;
+    font-weight: bold;
+    margin-top: 3vh;
+}
+
+
 #card-container
 {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
@@ -37,7 +54,7 @@
 {
     border: solid 2px var(--lines-color);
     width: 40vw;
-
+    min-width: 500px;
 }
 
 .card-title
@@ -64,9 +81,19 @@
     font-weight: bold;
 }
 
-.link:hover
+.link
+{
+    text-decoration: none;
+}
+
+.link:hover, .link:visited:hover
 {
     color: mediumseagreen;
+}
+
+.link, .link:visited
+{
+    color: var(--text-color);
 }
 
 canvas 
