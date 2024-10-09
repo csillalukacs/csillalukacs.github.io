@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import Cubie from './Cubie.js';
-import { outlinePass } from './main.js';
 
 export default class Cube
 {
@@ -13,7 +12,10 @@ export default class Cube
         this.cubies = [];
         this.raycaster = new THREE.Raycaster()
         this.mouse = new THREE.Vector2()
-        
+        this.rotationStarted = null;
+        this.rotationEnds = null;
+
+        Cube.ROTATION_DURATION = 200;
         
         this.sides = [];
         // 0 top, 1 bottom, 2 left, 3 right, 4 front, 5 back
@@ -41,24 +43,24 @@ export default class Cube
         this.hitbox = mesh;
         this.group.add(mesh);
 
-        //window.addEventListener("click", this.onClick.bind(this));
+        window.addEventListener("click", this.onClick.bind(this));
     }
 
-    // onClick(event)
-    // {
-    //     this.raycaster.setFromCamera(this.mouse, this.camera);
-    //     const intersects = this.raycaster.intersectObject(this.hitbox);
-    //     if (!intersects[0]) return;
-    //     const face = intersects[0].face;
-    //     for (let i = 0; i < 6; i++)
-    //     {
-    //         const key = Object.keys(Cubie.directions)[i];
-    //         if (face.normal.equals(Cubie.directions[key]))
-    //         {
-    //             this.startRotation(i);     
-    //         }
-    //     }
-    // }
+    onClick(event)
+    {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const intersects = this.raycaster.intersectObject(this.hitbox);
+        if (!intersects[0]) return;
+        const face = intersects[0].face;
+        for (let i = 0; i < 6; i++)
+        {
+            const key = Object.keys(Cubie.directions)[i];
+            if (face.normal.equals(Cubie.directions[key]))
+            {
+                this.startRotation(i);     
+            }
+        }
+    }
 
     getRelativePosition(cubie)
     {
@@ -92,12 +94,14 @@ export default class Cube
 
     updateSide(sideIndex)
     {
+        if (this.animating !== -1) return;
         this.cubies.forEach(cubie => 
         {
             const x = this.getRelativePosition(cubie);
             if (this.isOnSide(cubie, sideIndex))
             {
-                this.sides[sideIndex].array.push(cubie);
+                if (!this.sides[sideIndex].array.includes(cubie))
+                    this.sides[sideIndex].array.push(cubie);
                 this.sides[sideIndex].group.attach(cubie.mesh);
             }
             else
@@ -106,9 +110,7 @@ export default class Cube
                 this.theRest.attach(cubie.mesh);
             }
             const y = this.getRelativePosition(cubie);
-            if (!x.equals(y)) console.log(x,y);
         });
-    
     }
   
     createCubie(x, y, z, color) 
@@ -139,6 +141,12 @@ export default class Cube
     {
         if (this.animating !== -1) return;
         this.updateSide(sideIndex);
+        this.rotationStarted = Date.now();
+        this.rotationEnds = this.rotationStarted + Cube.ROTATION_DURATION;
+        const axis = (sideIndex === 0 || sideIndex === 1) ? "y" : 
+        (sideIndex === 2 || sideIndex === 3) ? "x" : "z";
+        this.startAngle = this.sides[sideIndex].group.rotation[axis];
+        this.endAngle = this.startAngle + Math.PI / 2;
         this.animating = sideIndex;
     }
 
@@ -158,33 +166,64 @@ export default class Cube
         }
     }
 
+    rotateSide(sideIndex, endAngle)
+    {
+        const axis = (sideIndex === 0 || sideIndex === 1) ? "y" : 
+        (sideIndex === 2 || sideIndex === 3) ? "x" : "z";
+
+        this.sides[sideIndex].group.rotation[axis] = endAngle % (Math.PI * 2);
+    }
+
     update() 
     {
         this.group.rotation.x += 0.002;
         this.group.rotation.y += 0.002;
+
         if (this.animating !== -1)
         {
-            this.animateSide(this.animating);
+            const delta = Date.now() - this.rotationStarted;
+            const angle = delta*(Math.PI / 2 / Cube.ROTATION_DURATION);
+            this.rotateSide(this.animating, this.startAngle + angle);
+            if (delta >= Cube.ROTATION_DURATION)
+            {
+                this.rotateSide(this.animating, this.endAngle);
+                const r = (angle) => Math.round(angle / (Math.PI/2)) * (Math.PI/2);
+                this.cubies.forEach(cubie => {
+                    cubie.mesh.rotation.x = r(cubie.mesh.rotation.x);
+                    cubie.mesh.rotation.y = r(cubie.mesh.rotation.y);
+                    cubie.mesh.rotation.z = r(cubie.mesh.rotation.z);
+                })
+                this.animating = -1;
+            }
+            return;
         } 
 
-        // this.raycaster.setFromCamera(this.mouse, this.camera)
-        // const intersects = this.raycaster.intersectObject(this.hitbox);
+        this.raycaster.setFromCamera(this.mouse, this.camera)
+        const intersects = this.raycaster.intersectObject(this.hitbox);
 
-        // if (!intersects[0])
-        // {
-        //     outlinePass.selectedObjects = [];        
-        //     return;
-        // };
+        for (const cubie of this.cubies)
+        {
+            cubie.mesh.material.emissive.set(0x000000);
+        }
 
-        // const face = intersects[0].face;
-        // for (let i = 0; i < 6; i++)
-        // {
-        //     const key = Object.keys(Cubie.directions)[i];
-        //     if (face.normal.equals(Cubie.directions[key]))
-        //     {
-        //         this.updateSide(i);
-        //         outlinePass.selectedObjects = this.sides[i].group.children;        
-        //     }
-        // }
+        if (!intersects[0])
+        {
+            return;
+        };
+
+        const face = intersects[0].face;
+        for (let i = 0; i < 6; i++)
+        {
+            const key = Object.keys(Cubie.directions)[i];
+            if (face.normal.equals(Cubie.directions[key]))
+            {
+                this.updateSide(i);
+                for (const cubie of this.sides[i].array)
+                {
+                    cubie.mesh.material.emissive.set(0x444444);
+                }
+                      
+            }
+        }
     }
 }

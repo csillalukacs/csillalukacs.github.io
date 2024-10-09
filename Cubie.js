@@ -56,8 +56,7 @@ export default class Cubie
                         
         geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-
-        const material = Cubie.material; 
+        const material = this.createMaterial(); 
         
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(this.x, this.y, this.z);

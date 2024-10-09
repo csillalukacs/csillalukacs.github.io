@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import Cube from './Cube.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import {OutlinePass} from 'three/addons/postprocessing/OutlinePass.js';
-import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 const sizes = {
     width: window.innerWidth,
@@ -83,27 +80,10 @@ const cube = new Cube(scene, camera);
 cube.addtoScene(scene);
 camera.position.z = 6;
 
-
-const geometry = new THREE.BoxGeometry(20, 20, 20);
-const material = new THREE.MeshStandardMaterial({ 
-    color: 0xffffff, roughness: 0.0, metalness: 0.0, side: THREE.BackSide 
-});
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-
-
-let composer = new EffectComposer( renderer );
-
-const renderPass = new RenderPass( scene, camera );
-composer.addPass( renderPass );
-
-export const outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
-composer.addPass( outlinePass );
-
 function animate() 
 {
     cube.update();
-	composer.render();
+    renderer.render(scene, camera);
 
 }
 renderer.setAnimationLoop( animate );
