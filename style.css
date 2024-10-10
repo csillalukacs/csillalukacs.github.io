@@ -1,12 +1,13 @@
 :root{
     --lines-color: rgba(100, 0, 80, 0.4);
     --text-color: rgba(5, 119, 128, 0.884);
+    --background-color: rgb(255, 240, 240);
 }
 
 *
 {
     font-family: Helvetica, sans-serif;
-    background-color: rgb(255, 240, 240);
+    background-color: var(--background-color);
     color: var(--text-color);
 }
 
@@ -24,10 +25,10 @@
 #header
 {
     font-size: 48px;
+    background-color: var(--background-color);
     font-family: 'Courier New', Courier, monospace;
     margin: auto;
-    width:40vw;
-    height: 10vh;
+    width:50vw;
     min-width: 500px;
     padding: 0;
     text-align: left;
@@ -35,6 +36,14 @@
     margin-top: 3vh;
 }
 
+#links
+{
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    font-size: 18px;
+    margin: 10px 0;
+}
 
 #card-container
 {
@@ -52,15 +61,15 @@
 
 .card
 {
-    border: solid 2px var(--lines-color);
-    width: 40vw;
+    border: solid 0px var(--lines-color);
+    width: 50vw;
     min-width: 500px;
 }
 
 .card-title
 {
-    background-color: var(--lines-color);
-    color: white;
+    /* background-color: var(--lines-color);
+    color: white; */
     font-size: 16px;
     font-weight: bold;
     padding: 3px;
@@ -86,7 +95,7 @@
     text-decoration: none;
 }
 
-.link:hover, .link:visited:hover
+.link:hover, .link *:hover, .link:visited:hover
 {
     color: mediumseagreen;
 }
