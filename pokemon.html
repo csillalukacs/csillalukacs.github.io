@@ -64,7 +64,7 @@
   <div class="checkbox-container">
     <h3>Toggle Type Visibility:</h3>
     <label>
-      <input type="checkbox" checked id="toggleAll" onchange="toggleAllCheckboxes(this)"> All
+      <input type="checkbox" id="toggleAll" checked onchange="toggleAllCheckboxes(this)"> All
     </label>
     <div id="typeCheckboxes"></div>
   </div>
@@ -185,10 +185,10 @@
 
     // Function to toggle highlight for a row
     function toggleHighlightRow(row) {
-      row.classList.toggle('highlight'); // Now directly toggles the row class
+      row.classList.toggle('highlight'); // Now directly toggles the row highlight
     }
 
-    // Function to toggle highlight for a column based on defending type
+    // Function to toggle highlight for a column
     function toggleHighlightColumn(defendingType) {
       const colIndex = types.indexOf(defendingType) + 1; // Find column index (1-based due to row header)
       tbody.querySelectorAll('tr').forEach(row => {
@@ -197,14 +197,20 @@
       theadRow.children[colIndex].classList.toggle('highlight'); // Toggle header column highlight
     }
 
-    // Function to toggle visibility of rows and columns
     function toggleVisibility(type) {
-      const colIndex = types.indexOf(type) + 1; // Find column index (1-based due to row header)
-      const checkbox = checkboxContainer.querySelector(`input[type="checkbox"][value="${type}"]`);
-      tbody.querySelectorAll('tr').forEach(row => {
-        row.children[colIndex].style.display = checkbox.checked ? '' : 'none';
-      });
-      theadRow.children[colIndex].style.display = checkbox.checked ? '' : 'none'; // Toggle header visibility
+        const colIndex = types.indexOf(type) + 1; // Find column index (1-based due to row header)
+        const checkbox = checkboxContainer.querySelector(`input[type="checkbox"][value="${type}"]`);
+        
+        // Toggle visibility of the defending type column
+        tbody.querySelectorAll('tr').forEach(row => {
+            row.children[colIndex].style.display = checkbox.checked ? '' : 'none';
+        });
+        theadRow.children[colIndex].style.display = checkbox.checked ? '' : 'none'; // Toggle header visibility
+
+        // Hide the entire row if the checkbox is unchecked
+        const attackingTypeRowIndex = types.indexOf(type);
+        const attackingTypeRow = tbody.children[attackingTypeRowIndex];
+        attackingTypeRow.style.display = checkbox.checked ? '' : 'none'; // Hide the row if the checkbox is unchecked
     }
 
     // Function to toggle all checkboxes
