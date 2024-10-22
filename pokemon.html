@@ -11,7 +11,7 @@
     }
     th, td {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 2px;
       text-align: center;
       width: 50px; /* Fixed width for columns */
       position: relative; /* Position relative for the overlay */
@@ -54,21 +54,22 @@
     .checkbox-container {
       margin-bottom: 10px;
     }
+    #typeCheckboxes {
+        display: flex;
+        flex-direction: column;
+    }
+    .content {
+      display: grid;
+      grid-template-columns: 8fr 2fr;
+    }
   </style>
 </head>
 <body>
 
   <h1>Pokémon Type Weakness Table</h1>
 
-  <!-- Checkbox container -->
-  <div class="checkbox-container">
-    <h3>Toggle Type Visibility:</h3>
-    <label>
-      <input type="checkbox" id="toggleAll" checked onchange="toggleAllCheckboxes(this)"> All
-    </label>
-    <div id="typeCheckboxes"></div>
-  </div>
-
+<div class="content">
+<div class="table-container">
   <table id="typeTable">
     <thead>
       <tr>
@@ -79,6 +80,17 @@
     <tbody>
     </tbody>
   </table>
+</div>
+    <!-- Checkbox container -->
+    <div class="checkbox-container">
+        <h3>Toggle Type Visibility:</h3>
+        <label>
+          <input type="checkbox" id="toggleAll" checked onchange="toggleAllCheckboxes(this)"> All
+        </label>
+        <div id="typeCheckboxes"></div>
+      </div>
+
+</div>
 
   <script>
     // Define the type effectiveness chart for all 18 types
