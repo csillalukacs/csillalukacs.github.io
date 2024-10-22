@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Type Weakness Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    td.super-effective {
+      background-color: #ff6666;
+    }
+    td.not-very-effective {
+      background-color: #ffff99;
+    }
+    td.immune {
+      background-color: #9999ff;
+    }
+    td.normal {
+      background-color: #ccffcc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pokémon Type Weakness Table</h1>
+
+  <table id="typeTable">
+    <thead>
+      <tr>
+        <th>Attacking \ Defending</th>
+        <!-- Column headers will be populated dynamically -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Table body will be populated dynamically -->
+    </tbody>
+  </table>
+
+  <script>
+    // Define a type effectiveness chart
+    const typeChart = {
+      normal: { weakTo: ['fighting'], resistantTo: [], immuneTo: ['ghost'] },
+      fire: { weakTo: ['water', 'ground', 'rock'], resistantTo: ['fire', 'grass', 'ice', 'bug', 'steel', 'fairy'], immuneTo: [] },
+      water: { weakTo: ['electric', 'grass'], resistantTo: ['fire', 'water', 'ice', 'steel'], immuneTo: [] },
+      electric: { weakTo: ['ground'], resistantTo: ['electric', 'flying', 'steel'], immuneTo: [] },
+      grass: { weakTo: ['fire', 'ice', 'poison', 'flying', 'bug'], resistantTo: ['water', 'electric', 'grass', 'ground'], immuneTo: [] },
+      ground: { weakTo: ['water', 'grass', 'ice'], resistantTo: ['poison', 'rock'], immuneTo: ['electric'] },
+      flying: { weakTo: ['electric', 'ice', 'rock'], resistantTo: ['grass', 'fighting', 'bug'], immuneTo: ['ground'] }
+      // Add more types as needed
+    };
+
+    const types = Object.keys(typeChart);
+
+    // Function to check effectiveness of an attack type against a defending type
+    function getEffectiveness(attackType, defendType) {
+      const defendInfo = typeChart[defendType];
+
+      if (defendInfo.immuneTo.includes(attackType)) return 'Immune';
+      if (defendInfo.weakTo.includes(attackType)) return 'Super Effective';
+      if (defendInfo.resistantTo.includes(attackType)) return 'Not Very Effective';
+      return 'Normal';
+    }
+
+    // Populate the table headers
+    const theadRow = document.querySelector('#typeTable thead tr');
+    types.forEach(type => {
+      const th = document.createElement('th');
+      th.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+      theadRow.appendChild(th);
+    });
+
+    // Populate the table body with effectiveness values
+    const tbody = document.querySelector('#typeTable tbody');
+    types.forEach(attackingType => {
+      const row = document.createElement('tr');
+
+      // Create the first column (attacking type)
+      const typeCell = document.createElement('td');
+      typeCell.textContent = attackingType.charAt(0).toUpperCase() + attackingType.slice(1);
+      row.appendChild(typeCell);
+
+      // Create effectiveness cells for each defending type
+      types.forEach(defendingType => {
+        const effectiveness = getEffectiveness(attackingType, defendingType);
+        const cell = document.createElement('td');
+        cell.textContent = effectiveness;
+
+        // Add class for coloring based on effectiveness
+        if (effectiveness === 'Super Effective') {
+          cell.classList.add('super-effective');
+        } else if (effectiveness === 'Not Very Effective') {
+          cell.classList.add('not-very-effective');
+        } else if (effectiveness === 'Immune') {
+          cell.classList.add('immune');
+        } else {
+          cell.classList.add('normal');
+        }
+
+        row.appendChild(cell);
+      });
+
+      tbody.appendChild(row);
+    });
+  </script>
+
+</body>
+</html>
