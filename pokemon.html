@@ -63,6 +63,9 @@
   <!-- Checkbox container -->
   <div class="checkbox-container">
     <h3>Toggle Type Visibility:</h3>
+    <label>
+      <input type="checkbox" checked id="toggleAll" onchange="toggleAllCheckboxes(this)"> All
+    </label>
     <div id="typeCheckboxes"></div>
   </div>
 
@@ -124,7 +127,10 @@
       checkbox.type = 'checkbox';
       checkbox.value = type; // Set the value to the type
       checkbox.checked = true;
-      checkbox.onchange = () => toggleVisibility(type);
+      checkbox.onchange = () => {
+        toggleVisibility(type);
+        updateAllCheckboxState();
+      };
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(type.charAt(0).toUpperCase() + type.slice(1)));
       checkboxContainer.appendChild(label);
@@ -196,15 +202,28 @@
       const colIndex = types.indexOf(type) + 1; // Find column index (1-based due to row header)
       const checkbox = checkboxContainer.querySelector(`input[type="checkbox"][value="${type}"]`);
       tbody.querySelectorAll('tr').forEach(row => {
-        if (checkbox.checked) {
-          // Show column if checkbox is checked
-          row.children[colIndex].style.display = '';
-        } else {
-          // Hide column if checkbox is unchecked
-          row.children[colIndex].style.display = 'none';
-        }
+        row.children[colIndex].style.display = checkbox.checked ? '' : 'none';
       });
       theadRow.children[colIndex].style.display = checkbox.checked ? '' : 'none'; // Toggle header visibility
+    }
+
+    // Function to toggle all checkboxes
+    function toggleAllCheckboxes(checkbox) {
+      const checkboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked; // Set each checkbox's checked state
+        toggleVisibility(cb.value); // Toggle visibility based on the state
+      });
+    }
+
+    // Function to update the state of the "All" checkbox based on individual checkboxes
+    function updateAllCheckboxState() {
+      const allCheckbox = document.getElementById('toggleAll');
+      const checkboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
+
+      // Check if all checkboxes are checked
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      allCheckbox.checked = allChecked; // Set the "All" checkbox state
     }
 
   </script>
