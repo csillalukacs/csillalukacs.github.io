@@ -7,7 +7,6 @@
   <style>
     table {
       border-collapse: collapse;
-      width: 100%;
       margin: 20px 0;
     }
     th, td {
@@ -26,7 +25,7 @@
       background-color: #66ff66; /* Green for Super Effective */
     }
     td.not-very-effective {
-      background-color: #ffff99; /* Yellow for Not Very Effective */
+      background-color: #ff9999; /* Red for Not Very Effective */
     }
     td.immune {
       background-color: #9999ff; /* Blue for Immune */
@@ -40,7 +39,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(211, 211, 211, 0.5); /* Light gray with opacity */
+      background-color: rgba(255, 255, 0, 0.5); /* Yellow with opacity */
       display: none; /* Initially hidden */
     }
     tr.highlight td .highlight-overlay {
@@ -52,16 +51,26 @@
     tr.highlight td {
       position: relative; /* Ensure position is relative to show overlay */
     }
+    .checkbox-container {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
 
   <h1>Pokémon Type Weakness Table</h1>
 
+  <!-- Checkbox container -->
+  <div class="checkbox-container">
+    <h3>Toggle Type Visibility:</h3>
+    <div id="typeCheckboxes"></div>
+  </div>
+
   <table id="typeTable">
     <thead>
       <tr>
         <th>Attacking \ Defending</th>
+        <!-- Type columns will be generated here -->
       </tr>
     </thead>
     <tbody>
@@ -103,8 +112,24 @@
       return 1;
     }
 
-    // Populate the table headers
+    // Populate the checkbox container and table headers
+    const checkboxContainer = document.getElementById('typeCheckboxes');
     const theadRow = document.querySelector('#typeTable thead tr');
+
+    // Add checkboxes for toggling visibility of types
+    types.forEach(type => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+
+      checkbox.type = 'checkbox';
+      checkbox.checked = true;
+      checkbox.onchange = () => toggleVisibility(type);
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(type.charAt(0).toUpperCase() + type.slice(1)));
+      checkboxContainer.appendChild(label);
+    });
+
+    // Populate the table headers
     types.forEach(type => {
       const th = document.createElement('th');
       th.textContent = type.charAt(0).toUpperCase() + type.slice(1);
@@ -133,7 +158,7 @@
         if (effectiveness === 2) {
           cell.classList.add('super-effective');
         } else if (effectiveness === 0.5) {
-          cell.classList.add('not-very-effective');
+          cell.classList.add('not-very-effective'); // Now red
         } else if (effectiveness === 0) {
           cell.classList.add('immune');
         } else {
@@ -163,6 +188,15 @@
         row.children[colIndex].classList.toggle('highlight');
       });
       theadRow.children[colIndex].classList.toggle('highlight'); // Toggle header column highlight
+    }
+
+    // Function to toggle visibility of rows and columns
+    function toggleVisibility(type) {
+      const colIndex = types.indexOf(type) + 1; // Find column index (1-based due to row header)
+      tbody.querySelectorAll('tr').forEach(row => {
+        row.children[colIndex].style.display = row.children[colIndex].style.display === 'none' ? '' : 'none';
+      });
+      theadRow.children[colIndex].style.display = theadRow.children[colIndex].style.display === 'none' ? '' : 'none'; // Toggle header visibility
     }
 
   </script>
