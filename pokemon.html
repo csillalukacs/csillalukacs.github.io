@@ -15,27 +15,27 @@
       padding: 8px;
       text-align: center;
     }
-    tr.highlight td {
-      background-color: #ffeb3b; /* Bright yellow for highlight */
-    }
     th {
       background-color: #f2f2f2;
       cursor: pointer; /* Indicate clickable header */
     }
     td.super-effective {
-      background-color: #ff6666;
+      background-color: #66ff66; /* Green for Super Effective */
     }
     td.not-very-effective {
-      background-color: #ffff99;
+      background-color: #ffff99; /* Yellow for Not Very Effective */
     }
     td.immune {
-      background-color: #9999ff;
+      background-color: #9999ff; /* Blue for Immune */
     }
     td.normal {
-      background-color: #ccffcc;
+      background-color: #ffffff; /* White for Normal */
+    }
+    tr.highlight td {
+      background-color: #ffeb3b; /* Bright yellow for row highlight */
     }
     .highlight {
-      background-color: #ffeb3b !important; /* Bright yellow for highlight */
+      background-color: #ffeb3b !important; /* Bright yellow for column highlight */
     }
   </style>
 </head>
@@ -82,10 +82,10 @@
     function getEffectiveness(attackType, defendType) {
       const defendInfo = typeChart[defendType];
 
-      if (defendInfo.immuneTo.includes(attackType)) return 'Immune';
-      if (defendInfo.weakTo.includes(attackType)) return 'Super Effective';
-      if (defendInfo.resistantTo.includes(attackType)) return 'Not Very Effective';
-      return 'Normal';
+      if (defendInfo.immuneTo.includes(attackType)) return 0;
+      if (defendInfo.weakTo.includes(attackType)) return 2;
+      if (defendInfo.resistantTo.includes(attackType)) return 0.5;
+      return 1;
     }
 
     // Populate the table headers
@@ -105,7 +105,7 @@
       // Create the first column (attacking type)
       const typeCell = document.createElement('td');
       typeCell.textContent = attackingType.charAt(0).toUpperCase() + attackingType.slice(1);
-      typeCell.addEventListener('click', () => toggleHighlightRow(row));
+      typeCell.addEventListener('click', () => toggleHighlightRow(row)); // Add event listener for row highlight
       row.appendChild(typeCell);
 
       // Create effectiveness cells for each defending type
@@ -115,11 +115,11 @@
         cell.textContent = effectiveness;
 
         // Add class for coloring based on effectiveness
-        if (effectiveness === 'Super Effective') {
+        if (effectiveness === 2) {
           cell.classList.add('super-effective');
-        } else if (effectiveness === 'Not Very Effective') {
+        } else if (effectiveness === 0.5) {
           cell.classList.add('not-very-effective');
-        } else if (effectiveness === 'Immune') {
+        } else if (effectiveness === 0) {
           cell.classList.add('immune');
         } else {
           cell.classList.add('normal');
