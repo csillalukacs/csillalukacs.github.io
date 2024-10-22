@@ -90,7 +90,7 @@
     types.forEach(type => {
       const th = document.createElement('th');
       th.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-      th.addEventListener('click', () => highlightColumn(type)); // Add event listener for column highlight
+      th.addEventListener('click', () => toggleHighlightColumn(type)); // Add event listener for column highlight
       theadRow.appendChild(th);
     });
 
@@ -102,7 +102,7 @@
       // Create the first column (attacking type)
       const typeCell = document.createElement('td');
       typeCell.textContent = attackingType.charAt(0).toUpperCase() + attackingType.slice(1);
-      typeCell.addEventListener('click', () => highlightRow(attackingType)); // Add event listener for row highlight
+      typeCell.addEventListener('click', () => toggleHighlightRow(attackingType)); // Add event listener for row highlight
       row.appendChild(typeCell);
 
       // Create effectiveness cells for each defending type
@@ -128,33 +128,25 @@
       tbody.appendChild(row);
     });
 
-    // Function to highlight a row based on attacking type
-    function highlightRow(attackingType) {
-      clearHighlight(); // Clear any previous highlight
+    // Function to toggle highlight for a row based on attacking type
+    function toggleHighlightRow(attackingType) {
       const rows = tbody.querySelectorAll('tr');
       rows.forEach(row => {
         if (row.firstChild.textContent.toLowerCase() === attackingType.toLowerCase()) {
-          row.classList.add('highlight');
+          row.classList.toggle('highlight');
         }
       });
     }
 
-    // Function to highlight a column based on defending type
-    function highlightColumn(defendingType) {
-      clearHighlight(); // Clear any previous highlight
+    // Function to toggle highlight for a column based on defending type
+    function toggleHighlightColumn(defendingType) {
       const colIndex = types.indexOf(defendingType) + 1; // Find column index (1-based due to row header)
       tbody.querySelectorAll('tr').forEach(row => {
-        row.children[colIndex].classList.add('highlight');
+        row.children[colIndex].classList.toggle('highlight');
       });
-      theadRow.children[colIndex].classList.add('highlight'); // Highlight header column
+      theadRow.children[colIndex].classList.toggle('highlight'); // Toggle header column highlight
     }
 
-    // Function to clear all highlights
-    function clearHighlight() {
-      document.querySelectorAll('.highlight').forEach(cell => {
-        cell.classList.remove('highlight');
-      });
-    }
   </script>
 
 </body>
