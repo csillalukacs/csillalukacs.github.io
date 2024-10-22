@@ -122,6 +122,7 @@
       const checkbox = document.createElement('input');
 
       checkbox.type = 'checkbox';
+      checkbox.value = type; // Set the value to the type
       checkbox.checked = true;
       checkbox.onchange = () => toggleVisibility(type);
       label.appendChild(checkbox);
@@ -193,10 +194,17 @@
     // Function to toggle visibility of rows and columns
     function toggleVisibility(type) {
       const colIndex = types.indexOf(type) + 1; // Find column index (1-based due to row header)
+      const checkbox = checkboxContainer.querySelector(`input[type="checkbox"][value="${type}"]`);
       tbody.querySelectorAll('tr').forEach(row => {
-        row.children[colIndex].style.display = row.children[colIndex].style.display === 'none' ? '' : 'none';
+        if (checkbox.checked) {
+          // Show column if checkbox is checked
+          row.children[colIndex].style.display = '';
+        } else {
+          // Hide column if checkbox is unchecked
+          row.children[colIndex].style.display = 'none';
+        }
       });
-      theadRow.children[colIndex].style.display = theadRow.children[colIndex].style.display === 'none' ? '' : 'none'; // Toggle header visibility
+      theadRow.children[colIndex].style.display = checkbox.checked ? '' : 'none'; // Toggle header visibility
     }
 
   </script>
