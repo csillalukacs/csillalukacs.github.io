@@ -14,6 +14,9 @@
       border: 1px solid #ddd;
       padding: 8px;
       text-align: center;
+      width: 50px; /* Fixed width for columns */
+      position: relative; /* Position relative for the overlay */
+      overflow: hidden; /* Hide overflow for the overlay */
     }
     th {
       background-color: #f2f2f2;
@@ -31,11 +34,23 @@
     td.normal {
       background-color: #ffffff; /* White for Normal */
     }
-    tr.highlight td {
-      background-color: #ffeb3b; /* Bright yellow for row highlight */
+    .highlight-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(211, 211, 211, 0.5); /* Light gray with opacity */
+      display: none; /* Initially hidden */
     }
-    .highlight {
-      background-color: #ffeb3b !important; /* Bright yellow for column highlight */
+    tr.highlight td .highlight-overlay {
+      display: block; /* Show overlay when highlighted */
+    }
+    tr td.highlight .highlight-overlay {
+      display: block; /* Show overlay when highlighted */
+    }
+    tr.highlight td {
+      position: relative; /* Ensure position is relative to show overlay */
     }
   </style>
 </head>
@@ -124,6 +139,11 @@
         } else {
           cell.classList.add('normal');
         }
+
+        // Add overlay for highlighting
+        const overlay = document.createElement('div');
+        overlay.classList.add('highlight-overlay');
+        cell.appendChild(overlay); // Append overlay to cell
 
         row.appendChild(cell);
       });
